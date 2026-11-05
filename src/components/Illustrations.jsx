@@ -90,10 +90,11 @@ const Journey = ({ from, to }) => {
 }
 
 /**
- * The castle, as a link to Excelsior. A plain click plays the journey first;
- * a middle-click or Ctrl+click opens the site in a new tab as links do.
+ * The journey to Excelsior, shared by every door to it. `travel(fromElement)`
+ * grows the castle out of that element (or goes straight there when motion is
+ * reduced); render `journey` somewhere that stays mounted.
  */
-export const CastleScene = ({ className = '' }) => {
+export const useJourney = () => {
   const { settings } = useLibrary()
   const [journey, setJourney] = useState(null)
 
@@ -110,15 +111,16 @@ export const CastleScene = ({ className = '' }) => {
     return () => window.removeEventListener('pageshow', reset)
   }, [])
 
-  const travel = (event) => {
-    if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey || event.button !== 0) return
-    // Without motion the link just goes, like any other.
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
-    event.preventDefault()
+  const travel = (fromElement) => {
     if (journey) return
+    // Without motion the door just opens.
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      window.location.assign(EXCELSIOR_URL)
+      return
+    }
     if (settings.sound !== false) playWhoosh()
 
-    const start = event.currentTarget.querySelector('.castle-art').getBoundingClientRect()
+    const start = fromElement.getBoundingClientRect()
     const viewWidth = window.innerWidth
     const viewHeight = window.innerHeight
     // Cover the screen, resting on its bottom edge, with the keep as near the middle as the edges allow.
@@ -131,13 +133,39 @@ export const CastleScene = ({ className = '' }) => {
     })
   }
 
+  return { travel, journey: journey && <Journey {...journey} /> }
+}
+
+/** A small castle with waving flags, for menus. */
+export const CastleThumb = ({ className = '' }) => (
+  <span className={`castle-thumb ${className}`} aria-hidden="true">
+    <CastleArt />
+  </span>
+)
+
+/**
+ * The castle, as a link to Excelsior. A plain click plays the journey first;
+ * a middle-click or Ctrl+click opens the site in a new tab as links do.
+ */
+export const CastleScene = ({ className = '' }) => {
+  const { settings } = useLibrary()
+  const { travel, journey } = useJourney()
+
+  const onClick = (event) => {
+    if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey || event.button !== 0) return
+    // Without motion the link just goes, like any other.
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
+    event.preventDefault()
+    travel(event.currentTarget.querySelector('.castle-art'))
+  }
+
   return (
     <>
-      <a className={`castle-scene ${className}`} href={EXCELSIOR_URL} aria-label="A distant kingdom: visit Excelsior" onClick={travel}>
+      <a className={`castle-scene ${className}`} href={EXCELSIOR_URL} aria-label="A distant kingdom: visit Excelsior" onClick={onClick}>
         <CastleArt weather={settings.seasonal !== false} />
         <span className="castle-hint" aria-hidden="true">A distant kingdom…</span>
       </a>
-      {journey && <Journey {...journey} />}
+      {journey}
     </>
   )
 }

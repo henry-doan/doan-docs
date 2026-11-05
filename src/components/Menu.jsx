@@ -62,9 +62,9 @@ const Menu = ({ label, trigger, triggerClassName = 'icon-button', items, align =
                 role="menuitem"
                 className={`menu-item ${item.danger ? 'is-danger' : ''}`}
                 disabled={item.disabled}
-                onClick={() => {
+                onClick={(event) => {
                   setIsOpen(false)
-                  item.onSelect()
+                  item.onSelect(event)
                 }}
               >
                 {item.icon && item.icon}

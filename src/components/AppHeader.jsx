@@ -6,6 +6,7 @@ import { markAllNotificationsRead, resetLibrary, setCat, setProfileName, setSeas
 import { navigate } from '../lib/router.js'
 import Dialog from './Dialog.jsx'
 import Icon from './Icon.jsx'
+import { CastleThumb, useJourney } from './Illustrations.jsx'
 import Logo from './Logo.jsx'
 import Menu from './Menu.jsx'
 
@@ -85,6 +86,7 @@ const ProfileMenu = () => {
   const { profile, settings } = useLibrary()
   const [dialog, setDialog] = useState(null)
   const close = () => setDialog(null)
+  const { travel, journey } = useJourney()
 
   const items = [
     {
@@ -115,6 +117,12 @@ const ProfileMenu = () => {
       icon: <Icon name="cat" size={18} />,
       onSelect: () => setCat(settings.cat === false),
     },
+    {
+      label: 'A distant kingdom…',
+      icon: <CastleThumb />,
+      // Read where the castle sits now, before the menu closes and takes it away.
+      onSelect: (event) => travel(event.currentTarget.querySelector('.castle-art')),
+    },
     { type: 'divider', key: 'd2' },
     { label: 'Reset sample library', icon: <Icon name="restore" size={18} />, danger: true, onSelect: () => setDialog('reset') },
   ]
@@ -132,6 +140,7 @@ const ProfileMenu = () => {
         }
         items={items}
       />
+      {journey}
       <Dialog title="Edit name" isOpen={dialog === 'name'} onClose={close}>
         <NameForm name={profile.name} onDone={close} />
       </Dialog>

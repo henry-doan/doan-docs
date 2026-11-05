@@ -1934,6 +1934,25 @@ a.book-spine:focus-visible {
   color: var(--danger);
 }
 
+/* The castle in the account menu: a small door to Excelsior. */
+.castle-thumb {
+  flex: none;
+  width: 40px;
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.menu-item:has(.castle-thumb) {
+  color: var(--royal-navy);
+  font-family: var(--font-serif);
+  font-style: italic;
+}
+
+.menu-item:hover .castle-thumb > .castle-art > img:first-child,
+.menu-item:focus-visible .castle-thumb > .castle-art > img:first-child {
+  filter: brightness(1.12) saturate(1.1);
+}
+
 .menu-divider {
   margin: 6px 4px;
   border: 0;
