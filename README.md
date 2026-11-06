@@ -8,7 +8,7 @@ A document editor with a royal navy and gold identity: a royal scriptorium broug
 
 Part of the Doan suite alongside Doan Excelsior. Built with React 19 and the React Compiler, with no UI framework and no backend.
 
-> **Status:** base app. The start screen, library, branding, and an editor with tables, images, page view, drop caps and wax seals are done. Sharing, and Word and PDF files, are planned for later. See [Roadmap](#roadmap).
+> **Status:** base app. The start screen, library, branding, and an editor with tables, images, page view, drop caps and wax seals are done. Word and PDF downloads are done. Sharing, and opening Word and PDF files, are planned for later. See [Roadmap](#roadmap).
 
 ## Features
 
@@ -63,8 +63,11 @@ Part of the Doan suite alongside Doan Excelsior. Built with React 19 and the Rea
 | ------ | ---- | ---- |
 | Plain text `.txt`, Markdown `.md` | Yes | `.txt` |
 | Web page `.html` | Yes | Yes (keeps tables and images) |
+| Word `.docx` | Not yet | Yes |
+| Word 97–2003 `.doc` | Not yet | Yes |
+| PDF `.pdf` | Not yet | Yes |
 
-Word and PDF support is planned for a later release.
+Word and PDF files are made in the browser and use the document’s paper size, orientation and margins. They keep headings, bold, italic, underline, strikethrough, text color, links, alignment, lists, quotes, tables (with merged cells and header rows) and images. The illuminated first letter becomes a gold capital on navy. WebP pictures are converted to PNG, and pictures from other sites that block it are left out. A `.doc` is a Word web archive, which Word, LibreOffice and Pages open. PDFs use Roboto, so text in scripts it doesn’t cover, such as Chinese or Japanese, won’t show. The Word and PDF code loads only the first time someone downloads one of those files.
 
 ## Getting started
 
@@ -251,7 +254,7 @@ Keyboard access throughout, visible gold focus rings, a skip-to-content button, 
 - Save immediately when the tab closes, and export or import the whole library as a backup file.
 - Splitting long paragraphs and tables across pages.
 - Fonts and font sizes, headers and footers.
-- Word (.docx, .doc) and PDF import and export.
+- Opening Word (.docx, .doc) and PDF files.
 
 **Later**
 - Sharing, comments and sync (needs a backend).
@@ -262,5 +265,7 @@ Keyboard access throughout, visible gold focus rings, a skip-to-content button, 
 | ------- | -------- | ------- |
 | React, Vite | App | MIT |
 | Tiptap, ProseMirror | Editor | MIT |
+| docx | Word export | MIT |
+| pdfmake | PDF export | MIT |
 
 Fonts are under the SIL Open Font License. Choose a license for your own code that’s compatible with these.

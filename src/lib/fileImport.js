@@ -31,6 +31,9 @@ const downloadBlob = (blob, fileName) => {
 const safeFileName = (title) => title.replace(/[\\/:*?"<>|]+/g, '-').trim() || 'Untitled document'
 
 export const EXPORT_FORMATS = [
+  { id: 'docx', label: 'Word document (.docx)' },
+  { id: 'doc', label: 'Word 97–2003 (.doc)' },
+  { id: 'pdf', label: 'PDF document (.pdf)' },
   { id: 'txt', label: 'Plain text (.txt)' },
   { id: 'html', label: 'Web page (.html)' },
 ]
@@ -41,13 +44,27 @@ const EXPORT_STYLE =
   'border:2px solid #c9a65b;border-radius:4px;background:#14243b;color:#e4c783;' +
   'font:600 3.4em/.9 Cinzel,"Trajan Pro","Times New Roman",serif}'
 
-export const downloadDocument = ({ title, content }, format) => {
-  const blob =
-    format === 'txt'
-      ? new Blob([htmlToText(content)], { type: 'text/plain;charset=utf-8' })
-      : new Blob(
-          [`<!doctype html><html><head><meta charset="utf-8"><title>${safeFileName(title)}</title><style>${EXPORT_STYLE}</style></head><body>${content}</body></html>`],
-          { type: 'text/html;charset=utf-8' },
-        )
+const webPage = (title, content) =>
+  new Blob(
+    [`<!doctype html><html><head><meta charset="utf-8"><title>${safeFileName(title)}</title><style>${EXPORT_STYLE}</style></head><body>${content}</body></html>`],
+    { type: 'text/html;charset=utf-8' },
+  )
+
+/**
+ * Builds the file for a format. Word and PDF are made by modules loaded on
+ * first use, so their libraries don't slow down opening the app.
+ * `json` is the editor's document and `layout` its page layout.
+ */
+const BUILDERS = {
+  txt: ({ content }) => new Blob([htmlToText(content)], { type: 'text/plain;charset=utf-8' }),
+  html: ({ title, content }) => webPage(title, content),
+  doc: async (input) => (await import('./exportDoc.js')).buildDoc(input),
+  docx: async (input) => (await import('./exportDocx.js')).buildDocx(input),
+  pdf: async (input) => (await import('./exportPdf.js')).buildPdf(input),
+}
+
+/** Saves the document to the person's device in `format`. */
+export const downloadDocument = async ({ title, content, json, layout }, format) => {
+  const blob = await BUILDERS[format]({ title, content, json, layout })
   downloadBlob(blob, `${safeFileName(title)}.${format}`)
 }

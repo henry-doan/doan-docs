@@ -1905,6 +1905,11 @@ a.book-spine:focus-visible {
   left: 0;
 }
 
+.menu-list.is-above {
+  top: auto;
+  bottom: calc(100% + 6px);
+}
+
 .menu-item {
   display: flex;
   align-items: center;

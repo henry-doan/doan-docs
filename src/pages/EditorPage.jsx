@@ -15,7 +15,7 @@ import {
   updatePageSetup,
 } from '../lib/documentStore.js'
 import { EXPORT_FORMATS, downloadDocument } from '../lib/fileImport.js'
-import { showToast } from '../lib/toastStore.js'
+import { dismissToast, showToast } from '../lib/toastStore.js'
 import EmptyState from '../components/EmptyState.jsx'
 import Icon from '../components/Icon.jsx'
 import Logo from '../components/Logo.jsx'
@@ -221,9 +221,17 @@ const Editor = ({ doc, pageViewSetting }) => {
     else setTitle(doc.title)
   }
 
-  const download = (format) => {
+  const download = async (format) => {
     flushSave()
-    downloadDocument({ title, content: editor.getHTML() }, format)
+    const isBuilt = ['docx', 'doc', 'pdf'].includes(format)
+    if (isBuilt) showToast(`Preparing “${title || 'Untitled'}”…`)
+    try {
+      await downloadDocument({ title, content: editor.getHTML(), json: editor.getJSON(), layout }, format)
+      if (isBuilt) dismissToast()
+    } catch (error) {
+      console.error(error)
+      showToast('That download couldn’t be made. Please try again.', { tone: 'error' })
+    }
   }
 
   const sheetStride = layout.height + PAGE_GAP
